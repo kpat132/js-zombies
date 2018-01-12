@@ -7,7 +7,11 @@
  * @param {string} name     The item's name.
  * @property {string} name
  */
-
+class Item {
+  constructor(name){
+    this.name = name;
+  }
+} 
 
 /**
  * Class => Weapon(name, damage)
@@ -25,14 +29,16 @@
  * @property {number} damage
  */
 
-
+class Weapon extends Item {
+  constructor(name, damage) {
+    super(name);
+    this.damage = damage;
+  }
+}
 /**
  * Weapon Extends Item Class
  * -----------------------------
  */
-
-
-
 /**
  * Class => Food(name, energy)
  * -----------------------------
@@ -49,14 +55,16 @@
  * @property {number} energy
  */
 
-
+ class Food extends Item{
+  constructor(name, energy){
+    super(name);
+    this.energy = energy;
+  }
+ }
 /**
  * Food Extends Item Class
  * -----------------------------
  */
-
-
-
 /**
  * Class => Player(name, health, strength, speed)
  * -----------------------------
@@ -79,6 +87,26 @@
  * @property {method} getMaxHealth         Returns private variable `maxHealth`.
  */
 
+class Player{
+  constructor(name,health,strength,speed){
+
+    this.name = name;
+    this.health = health;
+    this.strength = strength;
+    this.speed = speed;
+    this.isAlive = true;
+    this.equipped = false;
+
+    this._pack = [];
+    this._maxHealth = health;
+  }
+
+  getPack(){
+    return this._pack;
+  }
+  getMaxHealth(){
+    return this._maxHealth;
+  }
 
 /**
  * Player Class Method => checkPack()
@@ -91,7 +119,9 @@
  *
  * @name checkPack
  */
-
+  checkPack(){
+    console.log(this.getPack())
+  }
 
 /**
  * Player Class Method => takeItem(item)
@@ -110,7 +140,17 @@
  * @param {Item/Weapon/Food} item   The item to take.
  * @return {boolean} true/false     Whether player was able to store item in pack.
  */
-
+  takeItem(item){
+    if(this.getPack().length < 3){
+      console.log(this.name + item);
+      this.getPack().push(item);
+      return true;
+    }
+    else{
+      console.log("YOU CANT FIT ANY MORE STUFF IN YOUR PACK!")
+      return false;
+    }
+  }
 
 /**
  * Player Class Method => discardItem(item)
@@ -137,8 +177,18 @@
  * @param {Item/Weapon/Food} item   The item to discard.
  * @return {boolean} true/false     Whether player was able to remove item from pack.
  */
-
-
+  discardItem(item){
+    let itemIndex = this.getPack().indexOf(item);
+    if(itemIndex > -1 ){
+      console.log("Name: " + item + " was removed!");
+      this.getPack().splice(itemIndex, 1);
+      return true;
+    }
+    else{
+      console.log("Hmm item not found! Nothing was discarded!");
+      return false;
+    }
+  }
 /**
  * Player Class Method => equip(itemToEquip)
  * -----------------------------
@@ -158,8 +208,23 @@
  * @name equip
  * @param {Weapon} itemToEquip  The weapon item to equip.
  */
-
-
+equip(itemToEquip){
+var itemIndex = this.getPack().indexOf(itemToEquip);
+  if( itemToEquip instanceof Weapon && itemIndex > -1 ){
+    if(this.equipped === false){
+      this.equipped = itemToEquip;
+      this.discardItem(itemToEquip);
+    }
+    else if(this.equipped !== false){
+      this.getPack().splice(itemIndex, 1, this.equipped);
+      this.equipped = itemToEquip;
+    }
+    
+  }
+  else {
+      return false;  
+  }
+} 
 /**
  * Player Class Method => eat(itemToEat)
  * -----------------------------
@@ -178,7 +243,31 @@
  * @name eat
  * @param {Food} itemToEat  The food item to eat.
  */
+  eat(itemToEat){
 
+    var itemIndex = this.getPack().indexOf(itemToEat);
+      //if the food is food and if it is in the bag:
+    if(itemToEat instanceof Food && itemIndex > -1){
+      //if the item's health += the itemtoeat's energy is greater than the max health:
+      console.log("OMNOMNOMN...");  
+      if(this.health + itemToEat.energy > this.getMaxHealth() ){
+        //Then set the health equal to the max health and then discard from bag
+        this.health = this.getMaxHealth();
+        this.discardItem(itemToEat);
+      }
+      //else if the health += itemtoeat's energy is less than the max health
+      else if((this.health + itemToEat.energy) < this.getMaxHealth() ) {
+        //then add the item to eat's energy to your health and removes it from the bag
+        this.health += itemToEat.energy;
+        this.discardItem(itemToEat);
+      }
+    }
+      else{
+        console.log('There isnt any food!');
+      }
+    
+    
+  }
 
 /**
  * Player Class Method => useItem(item)
@@ -192,7 +281,14 @@
  * @name useItem
  * @param {Item/Weapon/Food} item   The item to use.
  */
-
+  useItem(item) {
+    if (item instanceof Weapon) {
+      this.equip(item);
+    }
+    else if (item instanceof Food) {
+      this.eat(item);
+    }
+  }
 
 /**
  * Player Class Method => equippedWith()
@@ -207,8 +303,21 @@
  * @name equippedWith
  * @return {string/boolean}   Weapon name or false if nothing is equipped.
  */
+  equippedWith(){
+  
+    if(this.equipped === false){
+      console.log("Nothing is equipped!!!")
+      return false;
+    }
+    else if(this.equipped !== false){
+      console.log(this.name + this.equipped.name);
+      return this.equipped.name;
+    }
+  }
 
 
+
+}
 /**
  * Class => Zombie(health, strength, speed)
  * -----------------------------
@@ -224,8 +333,16 @@
  * @property {number} speed
  * @property {boolean} isAlive      Default value should be `true`.
  */
+class Zombie{
 
-
+  constructor(health,strength,speed){
+    this.health = health;
+    this.strength = strength;
+    this.speed = speed;
+    this._maxHealth = health;
+    this.isAlive = true;
+  }
+}
 /**
  * Class => FastZombie(health, strength, speed)
  * -----------------------------
@@ -241,13 +358,16 @@
  * @param {number} speed            The zombie's speed.
  */
 
+class FastZombie extends Zombie{
+  constructor(health,strength, speed){
+    super(health,strengh,speed);
+  } 
+}
 
 /**
  * FastZombie Extends Zombie Class
  * -----------------------------
  */
-
-
 
 /**
  * Class => StrongZombie(health, strength, speed)
@@ -263,7 +383,11 @@
  * @param {number} strength         The zombie's strength.
  * @param {number} speed            The zombie's speed.
  */
-
+class StrongZombie extends Zombie{
+  constructor(health,strength, speed){
+    super(health,strengh,speed);
+  } 
+}
 
 /**
  * StrongZombie Extends Zombie Class
@@ -286,6 +410,11 @@
  * @param {number} strength         The zombie's strength.
  * @param {number} speed            The zombie's speed.
  */
+class RangedZombie extends Zombie{
+  constructor(health,strength, speed){
+    super(health,strengh,speed);
+  } 
+}
 
 
 /**
@@ -309,6 +438,11 @@
  * @param {number} strength         The zombie's strength.
  * @param {number} speed            The zombie's speed.
  */
+class ExplodingZombie extends Zombie{
+  constructor(health,strength, speed){
+    super(health,strengh,speed);
+  } 
+}
 
 
 /**
